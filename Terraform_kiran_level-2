@@ -1,0 +1,49 @@
+provider "aws" {
+    region = "us-east-2"
+  
+}
+
+resource "aws_s3_bucket" "Mybucket1" {
+
+    bucket = "mytestbucket-kiran123"  
+
+}
+
+
+
+resource "aws_iam_user" "iam_user1" {
+  name = "iam_user1"
+}
+
+resource "aws_iam_policy" "iam_policy" {
+  name        = "iamS3Policy"
+  description = "Allow user full access to a specific S3 bucket"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:ListBucket"
+        ],
+        Resource = "arn:aws:s3:::mytestbucket-kiran123"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ],
+        Resource = "arn:aws:s3:::mytestbucket-kiran123/*"
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_user_policy_attachment" "policy_attachment" {
+  user       = aws_iam_user.iam_user1.name
+  policy_arn = aws_iam_policy.iam_policy.arn
+}
